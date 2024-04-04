@@ -1,0 +1,31 @@
+---
+title: "Project Draft"
+format: pdf
+editor: visual
+---
+
+## **Introduction**
+
+To safeguard agricultural productivity and maintain soil health in Telangana, our research team is conducting an analysis of irrigation water quality across various mandals within the state. Leveraging data obtained from the \"Telangana Open Data Portal\", we aim to identify potential correlations between water quality parameters and their implications for irrigation practices. This initiative seeks to provide actionable insights for farmers, agricultural scientists, and policymakers to optimize water resource management strategies.
+
+Data Overview:
+
+-   **Mandal**: Administrative division in Telangana where the water sample was collected, serving as the primary geographical unit for our analysis.
+
+-   **Village**: Specific villages within each mandal from which samples were collected, offering granular data points for our study.
+
+-   **RSC** (Residual Sodium Carbonate): Indicates the excess of carbonate and bicarbonate ions over calcium and magnesium ions in water, crucial for evaluating the risk of soil sodicity.
+
+-   **SAR** (Sodium Adsorption Ratio): Measures the sodium hazard to crops and soil, a key factor in assessing water's suitability for irrigation.
+
+-   **Na** (Sodium content): The concentration of sodium in the water, which influences both SAR and the overall salinity hazard.
+
+-   **E.C** (Electrical Conductivity): Reflects the water's salinity level, directly impacting plant water uptake and soil structure.
+
+-   **TDS** (Total Dissolved Solids): The overall concentration of dissolved substances in water, indicating potential salinity issues.
+
+-   **HCO3** (Bicarbonate level): Concentration of bicarbonate in water, affecting soil pH and the precipitation of calcium and magnesium.
+
+-   **pH**: The acidity or alkalinity of the water, with significant implications for nutrient availability and microbial activity in the soil.
+
+The primary objective of this study is to establish a comprehensive understanding of irrigation water quality within Telangana's agricultural landscapes. By analyzing the relationships between the above water quality indicators and their collective impact on soil and plant health, we aim to categorize water sources into suitability classes for irrigation. This classification will help in formulating guidelines for water use in agriculture, thereby mitigating the risks associated with inappropriate water sources.
