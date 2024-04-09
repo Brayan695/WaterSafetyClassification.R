@@ -3,7 +3,7 @@ library(randomForest)
 library(caret)
 
 # Load Data
-ground_water_quality_2022_post <- read.csv("ground_water_quality_2022_post.csv")
+ground_water_quality_2022_post <- read.csv("C:/Users/Brayan Gutierrez/Desktop/4322 Project/4322_project/ground_water_quality_2022_post.csv")
 ground_water_quality_2022_post <- na.omit(ground_water_quality_2022_post)
 
 # Omitting CO3 and Season since they're the same
@@ -99,7 +99,7 @@ print(best_model)
 # Get the name of the best-performing model
 best_model_name <- best_model$Model
 # Find the corresponding parameters in the param_grid
-best_model_params <- param_grid[param_grid$Model == best_model_name, ]
+best_model_params <- param_grid[18, ]
 # Print the parameters of the best model
 print(best_model_params)
 
