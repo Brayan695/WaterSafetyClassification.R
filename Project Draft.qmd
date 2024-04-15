@@ -69,7 +69,7 @@ final_gw_df$Classification.1 = gsub("MR", "U.S.", final_gw_df$Classification.1)
 final_gw_df$Classification.1 = as.factor(final_gw_df$Classification.1)
 ```
 
-To obtain the testing error for a classification random forest model, we would need a confusion matrix. Since we are testing this model 10 times with different 80% training/20% testing sets, we decided to store all of the confusion matrices for these different splits in a list called `conf_mat`. Furthermore, each model's out-of-bag score was calculated and stored in the `OOB` list that is called before the loop. The model was trained on the 10 different training sets and then tested on 10 different testing sets in a for loop as the `cv.glm()` function would only work on a regression random forest model. The seed used in our model was set to 1. Additionally, we plotted the variable importance for each training/testing split. The code for this can be seen below:
+To obtain the testing error for a classification random forest model, we would need a confusion matrix. Since we are testing this model 10 times with different 80% training/20% testing sets, we decided to store all of the confusion matrices for these different splits in a list called `conf_mat`. Furthermore, each model's out-of-bag score was calculated and stored in the `OOB` list that is called before the loop. The model was trained on the 10 different training sets and then tested on 10 different testing sets in a for loop as the `cv.tree()` function would only work on a regression random forest model. The seed used in our model was set to 1. Additionally, we plotted the variable importance for each training/testing split. The code for this can be seen below:
 
 ```{r}
 conf_mat = list()
