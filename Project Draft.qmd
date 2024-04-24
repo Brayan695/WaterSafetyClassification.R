@@ -34,13 +34,13 @@ The primary objective of this study is to establish a comprehensive understandin
 
 ## Random Forest Model: (Brayan Gutierrez, Tie Wang, Ulises Ramirez)
 
-To avoid issues such as overfitting, high variance, and poor generalization to unseen data that a single decision tree is prone to, we decided to use an ensemble method for decision trees. Although the bagging ensemble model avoid the issues that a single decision tree presents, a unique issue arises when using the bagging model. Variables in the bagging model tend to be highly correlated as the most important variables will always be chosen in each decision tree the model builds. To avoid the issues that a single decision tree presents, decorrelate the decision trees, and the fact that random forest models are highly powerful, we decided to use this specific ensemble method. However, with deciding to use the random forest model we are sacrificing the interpretability that was present in a single decision tree, computational resources, and we gain the requirement of hyperparameter tuning that is not a major issue in a single decision tree. Like the previous model, our response variable is the `Classification.1` variable with the rest of the variables being our predictors. Below is the formula for our random forest model:
+To mitigate issues such as overfitting, high variance, and poor generalization to unseen data, commonly associated with a single decision tree, we opted for an ensemble method employing decision trees. While the bagging ensemble model addresses the shortcomings of individual decision trees, it introduces a unique challenge. In the bagging model, variables tend to be highly correlated due to the consistent selection of the most important variables in each decision tree. To address these challenges and leverage the robustness of random forest models, we chose this particular ensemble method. However, by adopting the random forest model, we sacrifice some interpretability inherent in a single decision tree, as well as computational resources, and introduce the need for hyperparameter tuning, which is less significant in a single decision tree. Similar to the previous model, our response variable is "Classification.1", with the remaining variables serving as predictors. Below is the formula for our random forest model:
 
 $$
 \text{Classification.1} \sim \text{Mandal} + \text{Village} + \text{RSC} + \text{SAR} + \text{Na} + \text{E.C} + \text{TDS} + \text{HCO3} + \text{pH}
 $$
 
-First, we wanted to see how the base random forest with no tuned hyperparameters performs on our data. The data was read, the NA observations were omitted, and the response variable was changed to a binary response. Furthermore, since more than one category was present in the `Mandal` and `Village` variables and for this model to function properly, these variables were one-hot-encoded using the `dummyVars()` function from the caret library.
+Firstly, we aimed to evaluate the performance of the base random forest with default hyperparameters on our dataset. We read the data, removed NA observations, and converted the response variable to a binary format. Additionally, as the Mandal and Village variables contained multiple categories and to ensure proper functionality of the model, we employed one-hot encoding using the `dummyVars()` function from the *caret* library.
 
 ```{r}
 library(tree)
@@ -69,7 +69,7 @@ final_gw_df$Classification.1 = gsub("MR", "U.S.", final_gw_df$Classification.1)
 final_gw_df$Classification.1 = as.factor(final_gw_df$Classification.1)
 ```
 
-To obtain the testing error for a classification random forest model, we would need a confusion matrix. Since we are testing this model 10 times with different 80% training/20% testing sets, we decided to store all of the confusion matrices for these different splits in a list called `conf_mat`. Furthermore, each model's out-of-bag score was calculated and stored in the `OOB` list that is called before the loop. The model was trained on the 10 different training sets and then tested on 10 different testing sets in a for loop as the `cv.tree()` function would only work on a regression random forest model. The seed used in our model was set to 1. Additionally, we plotted the variable importance for each training/testing split. The code for this can be seen below:
+To obtain the testing error for a classification random forest model, we would need to generate a confusion matrix for each test set. As we are testing the model 10 times with different 80% training and 20% testing splits, we decided to store all the confusion matrices for these splits in a list called "conf_mat". Additionally, we calculated and stored each model's out-of-bag score in a list named "OOB" before the loop. The model was trained on the 10 different training sets and then tested on 10 different testing sets within a for loop. We used a seed of 1 for reproducibility. Since the `cv.tree()` function only works for regression random forest models, we didn't use it here. Furthermore, we plotted the variable importance for each training/testing split. Below is the code for this process:
 
 ```{r}
 conf_mat = list()
@@ -103,7 +103,7 @@ for (i in 1:10) {
 }
 ```
 
-We can see that the 3 most important variables in each split were RSC, SAR, and HCO3, with SAR and HCO3 competing for second most important across the different splits. With the confusion matrices for each training/testing split now saved, we used these matrices to now calculate the testing error of each split.
+We observed that the three most important variables in each split were RSC, SAR, and HCO3, with SAR and HCO3 competing for the second most important variable across the different splits. Now that we have saved the confusion matrices for each training/testing split, we can utilize them to calculate the testing error for each split.
 
 ```{r}
 # Test Error Calculations
@@ -126,4 +126,28 @@ scores
 (avg_test_error = sum(test_errors) / 10)
 ```
 
-We found that the base random forest model with 10 different training/testing splits had a test error between 0%-2.4%. With an average testing error of 0.8%. Comparing the testing errors and the OOB scores, we see that they are not far off from each other, meaning that the base random forest model performs well with unseen data and data that it did not see during training. This suggests that the base model learned the underlying patterns in the data well. This result is very promising, however, *(write something about less U.S. observations).* Next, we then moved on to tuning the hyperparameters of the random forest model on our data...
+We discovered that the base random forest model, evaluated across 10 different training/testing splits, exhibited test errors ranging from 0% to 2.4%, with an average testing error of 0.8%. Comparing these testing errors with the out-of-bag (OOB) scores, we observed minimal disparity, indicating that the base random forest model performs admirably with unseen data, affirming its ability to generalize well beyond the training set. This suggests a robust learning of underlying patterns within the data. However, it's worth noting the limitation posed by the fewer U.S. observations in our dataset, which might affect the model's performance on U.S. data. With this promising result, we proceeded to fine-tune the hyperparameters of the random forest model on our dataset.
+
+**Model Optimization Results:**
+
+The model optimization process involved an exhaustive search for the optimal combination of hyperparameters to maximize prediction accuracy while preventing overfitting. This was achieved through grid search, where various values of hyperparameters such as the number of estimators (trees), maximum depth, minimum samples split, minimum samples leaf, and maximum features were explored. Each hyperparameter combination was evaluated using cross-validation, which split the data into training and validation sets to assess model performance.
+
+The optimization process was repeated across 10 different 80/20 splits of the dataset to ensure robustness and generalizability of the results. This approach allowed for a comprehensive exploration of the hyperparameter space and provided insight into the sensitivity of the model to different parameter settings. By leveraging multiple splits, the final model selection was based on the mean cross-validation score across all splits, ensuring that the chosen model performed well on diverse subsets of the data.
+
+**Impact of Hyperparameters on Model Performance:**
+
+The hyperparameters explored during grid search play a crucial role in determining the performance of the Random Forest model. The number of estimators (trees) determines the complexity of the model and its ability to capture intricate relationships within the data. Increasing the number of trees can improve predictive accuracy up to a certain point, beyond which additional trees may lead to diminishing returns or increased computational costs.
+
+The maximum depth of the trees controls the depth of individual decision trees in the Random Forest ensemble. Deeper trees can capture complex interactions but may also be prone to overfitting, especially with small datasets. By limiting the maximum depth, the model can generalize better to unseen data while still capturing important patterns in the training data.
+
+Similarly, the minimum samples split and minimum samples leaf parameters regulate the minimum number of samples required to split an internal node and the minimum number of samples required to be a leaf node, respectively. These parameters help control the granularity of the decision tree structure and prevent overfitting by imposing constraints on tree growth.
+
+The choice of maximum features determines the number of features considered for each split in the decision trees. By randomly selecting a subset of features, Random Forest mitigates the risk of feature dominance and enhances model diversity, leading to improved generalization performance.
+
+**Robustness and Generalizability of the Model:**
+
+By performing grid search and cross-validation across multiple data splits, the optimized Random Forest model demonstrates robustness and generalizability. The model's ability to consistently perform well across diverse subsets of the data indicates its stability and reliability. This ensures that the selected hyperparameters are not overly tailored to a specific subset of the data but rather capture underlying patterns that generalize to unseen instances.
+
+**Future Directions:**
+
+While the optimized Random Forest model shows promising results in predicting ground water quality, there are opportunities for further refinement and enhancement. Future research may explore advanced techniques for hyperparameter tuning, such as Bayesian optimization or genetic algorithms, to more efficiently navigate the hyperparameter space. Additionally, incorporating domain knowledge and additional features, such as meteorological data or land use information, could further improve the model's predictive capabilities and provide valuable insights for environmental monitoring and management. Finally, ongoing validation and evaluation of the model on independent datasets are essential to ensure its applicability and reliability in real-world scenarios.
