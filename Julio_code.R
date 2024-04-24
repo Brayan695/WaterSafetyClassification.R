@@ -1,7 +1,7 @@
 library(tree)
 library(randomForest)
 library(caret)
-set.seed(123)
+set.seed(1)
 
 # Load Data
 ground_water_quality_2022_post <- read.csv("ground_water_quality_2022_post.csv")
