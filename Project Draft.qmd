@@ -145,7 +145,6 @@ Similarly, the minimum samples split and minimum samples leaf parameters regulat
 The choice of maximum features determines the number of features considered for each split in the decision trees. By randomly selecting a subset of features, Random Forest mitigates the risk of feature dominance and enhances model diversity, leading to improved generalization performance.
 
 ```{r}
-{r}
 # Define parameter grid for grid search
 param_grid <- expand.grid(
   n_estimators = c(50, 100, 200),
@@ -168,7 +167,7 @@ By performing grid search and cross-validation across multiple data splits, the 
 # Perform 10 different 80/20 splits and grid search on each split
 for (split in 1:10) {
   # Set seed for reproducibility
-  set.seed(split)
+  set.seed(1)
   
   # Split data into training and testing sets (80/20 split)
   sample <- sample(1:nrow(final_gw_df), 0.8 * nrow(final_gw_df))
@@ -222,21 +221,38 @@ for (split in 1:10) {
   }
 }
 
-# Print results
-print(results)
 
-# Convert results to a data frame for easier manipulation
+print(results)
 results_df <- data.frame(Model = names(results), Score = unlist(results))
 # Find the row with the highest score
 best_model <- results_df[which.max(results_df$Score), ]
-# Print the best model
 print(best_model)
-# Get the name of the best-performing model
 best_model_name <- best_model$Model
 # Find the corresponding parameters in the param_grid
 best_model_params <- param_grid[grep(best_model_name, rownames(param_grid)), ]
-# Print the parameters of the best model
 print(best_model_params)
+
+
+best_model_name <- best_model$Model
+best_model_hyperparams <- unlist(strsplit(best_model_name, "_"))
+# Extract the values of the best hyperparameters
+best_model_values <- best_model_hyperparams[grep("^[0-9]+$", best_model_hyperparams)]
+
+# Check if any values were found
+if (length(best_model_values) > 0) {
+  print(best_model_values)
+} else {
+  print("No values found for the best hyperparameters.")
+}
+
+
+# Extract split number and model number
+split_number <- as.integer(best_model_values[1])
+model_number <- as.integer(best_model_values[2])
+# Get the corresponding row in param_grid
+best_model_params <- param_grid[model_number, ]
+print(best_model_params)
+
 ```
 
 **\
@@ -245,6 +261,10 @@ print(best_model_params)
 ```{r figurename1, echo=FALSE, out.width = '90%'}
 knitr::include_graphics("Julio_Code_Result.png")
 
+```
+
+```{r figurename1, echo=FALSE, out.width = '90%'}
+knitr::include_graphics("Julio_Code_Result_2.png")
 ```
 
 **\
