@@ -4,7 +4,7 @@ format: pdf
 editor: visual
 ---
 
-## **Introduction**
+# **Introduction**
 
 To safeguard agricultural productivity and maintain soil health in Telangana, our research team is conducting an analysis of irrigation water quality across various mandals within the state. Leveraging data obtained from the "Telangana Open Data Portal", we aim to identify potential correlations between water quality parameters and their implications for irrigation practices. This initiative seeks to provide actionable insights for farmers, agricultural scientists, and policymakers to optimize water resource management strategies. From previous pre-processing of the data, we found that the following features might have a bigger impact on our models.
 
@@ -31,6 +31,8 @@ Data Overview:
 -   **Classification.1:** Safety classification of the water (Safe P.S., Marginal MR, Unsafe U.S.). This variable is our response variable and has been changed to a binary response by changing MR to U.S.
 
 The primary objective of this study is to establish a comprehensive understanding of irrigation water quality within Telangana's agricultural landscapes. By analyzing the relationships between the above water quality indicators and their collective impact on soil and plant health, we aim to categorize water sources into suitability classes for irrigation. This classification will help in formulating guidelines for water use in agriculture, thereby mitigating the risks associated with inappropriate water sources.
+
+# Methods
 
 ## Random Forest Model: (Brayan Gutierrez, Tie Wang, Ulises Ramirez)
 
@@ -108,6 +110,7 @@ We observed that the three most important variables in each split were RSC, SAR,
 ```{r}
 # Test Error Calculations
 test_errors = rep(0, 10)
+accuracies = rep(0, 10)
 
 for (i in 1:10) {
     TP = conf_mat[[i]][2, 2]  # True Positives
@@ -116,10 +119,13 @@ for (i in 1:10) {
     TN = conf_mat[[i]][1, 1]  # True Negatives
     
     # Calculating test error rate
-    test_errors[i] <- (FP + FN) / sum(conf_mat[[i]])
+    test_errors[i] = (FP + FN) / sum(conf_mat[[i]])
+    
+    # Calculating Accuracies
+    accuracies[i] = (TP + TN) / sum(conf_mat[[i]])
 }
 
-scores = list(test_error = test_errors, OOB_score = OOB)
+scores = list(test_error = test_errors, OOB_score = OOB, accuracy = accuracies)
 
 scores
 
@@ -144,7 +150,7 @@ Similarly, the minimum samples split and minimum samples leaf parameters regulat
 
 The choice of maximum features determines the number of features considered for each split in the decision trees. By randomly selecting a subset of features, Random Forest mitigates the risk of feature dominance and enhances model diversity, leading to improved generalization performance.
 
-```{r}
+```{r, eval=FALSE}
 # Define parameter grid for grid search
 param_grid <- expand.grid(
   n_estimators = c(50, 100, 200),
@@ -163,7 +169,7 @@ results <- list()
 
 By performing grid search and cross-validation across multiple data splits, the optimized Random Forest model demonstrates robustness and generalizability. The model's ability to consistently perform well across diverse subsets of the data indicates its stability and reliability. This ensures that the selected hyperparameters are not overly tailored to a specific subset of the data but rather capture underlying patterns that generalize to unseen instances.
 
-```{r}
+```{r, eval=FALSE}
 # Perform 10 different 80/20 splits and grid search on each split
 for (split in 1:10) {
   # Set seed for reproducibility
@@ -256,22 +262,18 @@ print(best_model_params)
 ```
 
 **\
-**
-
-```{r figurename1, echo=FALSE, out.width = '90%'}
-knitr::include_graphics("Julio_Code_Result.png")
-
-```
-
-```{r figurename1, echo=FALSE, out.width = '90%'}
-knitr::include_graphics("Julio_Code_Result_2.png")
-```
-
-**\
-Results:** The results of the model evaluation indicate that the model labeled as "Split_2_Model_46" achieved a mean cross-validation score of approximately 0.9954 for Split 2 of the data. This score suggests that the model performed exceptionally well on the validation data for this particular split. Further analysis reveals that this model was trained with a specific combination of hyperparameters, which can be found below the Score.
+**The results of the model evaluation indicate that the model labeled as "Split_2_Model_46" achieved a mean cross-validation score of approximately 0.9954 for Split 2 of the data. This score suggests that the model performed exceptionally well on the validation data for this particular split. Further analysis reveals that this model was trained with a specific combination of hyperparameters, which can be found below the Score.
 
 In conclusion, the machine learning model developed using Random Forests and optimized through cross-validation demonstrates high predictive accuracy for the task of groundwater quality prediction. The results of the evaluation process provide valuable insights into the performance of the model and offer guidance for future model development and refinement.
 
 **Future Directions:**
 
 While the optimized Random Forest model shows promising results in predicting ground water quality, there are opportunities for further refinement and enhancement. Future research may explore advanced techniques for hyperparameter tuning, such as Bayesian optimization or genetic algorithms, to more efficiently navigate the hyperparameter space. Additionally, incorporating domain knowledge and additional features, such as meteorological data or land use information, could further improve the model's predictive capabilities and provide valuable insights for environmental monitoring and management. Finally, ongoing validation and evaluation of the model on independent datasets are essential to ensure its applicability and reliability in real-world scenarios.
+
+# Results
+
+## Random Forest:
+
+In general, we observed that the random forest model, whether base or tuned, performed well on the testing data. This indicates that our models are robust and generalizable. Starting with the base model, among the 10 different splits, we observed testing errors between 0% to 2.4% and accuracies between 97.6% to 100%. This suggests that our variables positively contributed to our base model's classification of the test observations, with RSC, SAR, and HCO3 being the most important across all models. It is safe to assume that these top variables, along with the other important variables, will be present during the tuning process of the random forest model. This addresses our objective of identifying correlations between water quality parameters and their implications for soil health. By tuning the model, we were able to find the optimal hyperparameters that minimized the model's test error and maximized accuracy on unseen data. We observed that the parameters that led to the best results were 46 estimators, a max depth of 50, a minimum sample split of 5, a minimum leaf sample of 3, and a maximum number of features of $\sqrt{p}$ where $p$ is the total number of features. With these hyperparameters, and the previously identified water quality parameters, we ensure that our model would have a classification accuracy of approximately 99%.
+
+# Conclusion
