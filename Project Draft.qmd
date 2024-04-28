@@ -34,7 +34,41 @@ The primary objective of this study is to establish a comprehensive understandin
 
 # Methods
 
-## Random Forest Model: (Brayan Gutierrez, Tie Wang, Ulises Ramirez)
+## Logistic Regression Model: (Harris Adnan, Stanley Okoye)
+
+We evaluate a logistic regression model to classify groundwater data based on certain features. We want to then determine the accuracy of our model using logistic regression. Logistic Regression was used because our data is a binary response variable and it is only natural that Logistic Regression is used here because Logistic Regression is popular for working with tasks involving binary outcomes.  So, not only do we determine the accuracy of our outcome, but we also evaluate its effectiveness in predicting a binary outcome with Classification.1. Furthermore, Logistic Regression is fast and computationally efficient. Groundwater dataset being massive, and Logistic Regression being suitable for large datasets, it’s a natural fit. Logistic Regression is built to handle numerical and categorical variables, especially when it comes to preprocessing steps like one-hot encode, and we did use one-hot encoding and so our code converts the categorical data into a suitable format for modeling. So, with everything in mind, Logistic Regression just became the right choice to classify our dataset, giving a clear interpretation, optimized computation, and smooth integration.
+
+Our approach was based on the knowledge we gained during our lectures and through the slides of Dr. Poliak. Some of these commands were taught to us in class, while some of these commands are based off of research, and through our experience with the Introduction to Artificial Intelligence class. Following are the detailed steps we took for our Logistic Regression model:
+
+**Preparing the Data:**
+
+We import the libraries needed. For data visualization we import “ggplot2” and for data partitioning and model evaluation we import “caret”. We convert “Classification.1” to binary form. A subset of columns, namely RSC, SAR, Na, E.C, TDS, HCO3, pH, Mandal, and Village from groundwater dataset are selected. Use na.omit() to remove rows with missing data. “Mandal” and “Village” being categorical variables, are converted to factors, because in R, factors represent categorical variables. One-hot encoding is applied to “Mandal” and “Village”. We use model.matrix() to create dummy variables, and have Classification.1 as a response variable. This facilitates their use in the regression model. The dummy variables and the response variable are combined to create the final dataset, for which we used “final_data”. The following is our model's formula.
+
+$$
+f(x)=\beta_0 + \beta_1 \cdot RSC + \beta_2 \cdot SAR + \beta_3 \cdot Na + \beta_4 \cdot E.C + \beta_5 \cdot TDS + \beta_6 \cdot HCO3 + \beta_7 \cdot pH + \beta_8 \cdot Mandal + \beta_9 \cdot Village
+$$
+
+**Partitioning the Data:**
+
+We set our seed to 123 for reproducibility. We split “final_data” into training and testing sets using “createDataPartition”. This makes our model use 80% for training and the remaining 20% for testing.  The split is stratified based on the response variable, ensuring the equal distribution of classes in both sets.
+
+**Logistic Regression:**
+
+We build our Logistic Regression model using glm with a binomial family, and having classification.1 as our response variable, and the rest of the columns as predictors. To see information about coefficients, their significance, and other details we use the “summary(model)” command. In this case we only get to see the summary for “mandal” and “village”.
+
+**Making Predictions**
+
+In order to make predictions on the test set, we use predict() command. Since Logistic Regression is popular for its usage to predict the probability of an outcome, we use the ‘Type = “response”’ argument to indicate that predictions should be probabilities. Now we want to convert our predicted probabilities to binary class predictions, for which we used the command “ifelse(predictions \> 0.5, 1, 0)”, using a threshold of 0.5. This indicates that if the probability is greater than 0.5, the predicted class is 1, otherwise, it's 0.
+
+**Accuracy**
+
+With the help of Dr. Poliak’s lectures and slides, we create a confusion matrix to compare predicted class with the actual class in test set. The confusion matrix is important as it assists in the evaluation of the performance of our model. Now comes the main part, that is calculating the accuracy. To calculate accuracy we used the command “​​accuracy \<- sum(diag(confusionMatrix)) / sum(confusionMatrix)”. In simple words, divide the sum of the diagonal elements in the Confusion Matrix by the total number of predictions. We get an accuracy of approximately 88.32%, indicating that the logistic regression model correctly predicts the outcome about 88% of the time. *(FIX THIS)*
+
+**Summary**
+
+We pre-process the data, apply logistic regression modeling, and evaluate accuracy to predict binary classifications for groundwater dataset. One-hot encoding technique was used for “Mandal” and “Village”, data was partitioned, and confusion matrix was computed to analyze the model’s performance.
+
+## Random Forest Model: (Brayan Gutierrez, Ulises Ramirez, Tie Wang)
 
 To mitigate issues such as overfitting, high variance, and poor generalization to unseen data, commonly associated with a single decision tree, we opted for an ensemble method employing decision trees. While the bagging ensemble model addresses the shortcomings of individual decision trees, it introduces a unique challenge. In the bagging model, variables tend to be highly correlated due to the consistent selection of the most important variables in each decision tree. To address these challenges and leverage the robustness of random forest models, we chose this particular ensemble method. However, by adopting the random forest model, we sacrifice some interpretability inherent in a single decision tree, as well as computational resources, and introduce the need for hyperparameter tuning, which is less significant in a single decision tree. Similar to the previous model, our response variable is "Classification.1", with the remaining variables serving as predictors. Below is the formula for our random forest model:
 
@@ -271,6 +305,8 @@ In conclusion, the machine learning model developed using Random Forests and opt
 While the optimized Random Forest model shows promising results in predicting ground water quality, there are opportunities for further refinement and enhancement. Future research may explore advanced techniques for hyperparameter tuning, such as Bayesian optimization or genetic algorithms, to more efficiently navigate the hyperparameter space. Additionally, incorporating domain knowledge and additional features, such as meteorological data or land use information, could further improve the model's predictive capabilities and provide valuable insights for environmental monitoring and management. Finally, ongoing validation and evaluation of the model on independent datasets are essential to ensure its applicability and reliability in real-world scenarios.
 
 # Results
+
+## Logistic Regression:
 
 ## Random Forest:
 
