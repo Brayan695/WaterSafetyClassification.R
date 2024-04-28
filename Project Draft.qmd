@@ -42,7 +42,7 @@ Our approach was based on the knowledge we gained during our lectures and throug
 
 **Preparing the Data:**
 
-We import the libraries needed. For data visualization we import “ggplot2” and for data partitioning and model evaluation we import “caret”. We convert “Classification.1” to binary form. A subset of columns, namely RSC, SAR, Na, E.C, TDS, HCO3, pH, Mandal, and Village from groundwater dataset are selected. Use na.omit() to remove rows with missing data. “Mandal” and “Village” being categorical variables, are converted to factors, because in R, factors represent categorical variables. One-hot encoding is applied to “Mandal” and “Village”. We use model.matrix() to create dummy variables, and have Classification.1 as a response variable. This facilitates their use in the regression model. The dummy variables and the response variable are combined to create the final dataset, for which we used “final_data”. The following is our model's formula.
+We import the libraries needed. For data visualization we import `ggplot2`and for data partitioning and model evaluation we import `caret`. We convert “Classification.1” to binary form. A subset of columns, namely RSC, SAR, Na, E.C, TDS, HCO3, pH, Mandal, and Village from groundwater dataset are selected. Use na.omit() to remove rows with missing data. “Mandal” and “Village” being categorical variables, are converted to factors, because in R, factors represent categorical variables. One-hot encoding is applied to “Mandal” and “Village”. We use `model.matrix()` to create dummy variables, and have Classification.1 as a response variable. This facilitates their use in the regression model. The dummy variables and the response variable are combined to create the final dataset, for which we used “final_data”. The following is our model's formula.
 
 $$
 f(x)=\beta_0 + \beta_1 \cdot RSC + \beta_2 \cdot SAR + \beta_3 \cdot Na + \beta_4 \cdot E.C + \beta_5 \cdot TDS + \beta_6 \cdot HCO3 + \beta_7 \cdot pH + \beta_8 \cdot Mandal + \beta_9 \cdot Village
@@ -50,19 +50,19 @@ $$
 
 **Partitioning the Data:**
 
-We set our seed to 123 for reproducibility. We split “final_data” into training and testing sets using “createDataPartition”. This makes our model use 80% for training and the remaining 20% for testing.  The split is stratified based on the response variable, ensuring the equal distribution of classes in both sets.
+We set our seed to 123 for reproducibility. We split “final_data” into training and testing sets using `createDataPartition`. This makes our model use 80% for training and the remaining 20% for testing.  The split is stratified based on the response variable, ensuring the equal distribution of classes in both sets.
 
 **Logistic Regression:**
 
-We build our Logistic Regression model using glm with a binomial family, and having classification.1 as our response variable, and the rest of the columns as predictors. To see information about coefficients, their significance, and other details we use the “summary(model)” command. In this case we only get to see the summary for “mandal” and “village”.
+We build our Logistic Regression model using glm with a binomial family, and having classification.1 as our response variable, and the rest of the columns as predictors. To see information about coefficients, their significance, and other details we use the `summary(model)` command. In this case we only get to see the summary for “mandal” and “village”.
 
 **Making Predictions**
 
-In order to make predictions on the test set, we use predict() command. Since Logistic Regression is popular for its usage to predict the probability of an outcome, we use the ‘Type = “response”’ argument to indicate that predictions should be probabilities. Now we want to convert our predicted probabilities to binary class predictions, for which we used the command “ifelse(predictions \> 0.5, 1, 0)”, using a threshold of 0.5. This indicates that if the probability is greater than 0.5, the predicted class is 1, otherwise, it's 0.
+In order to make predictions on the test set, we use `predict()` command. Since Logistic Regression is popular for its usage to predict the probability of an outcome, we use the `Type = “response”` argument to indicate that predictions should be probabilities. Now we want to convert our predicted probabilities to binary class predictions, for which we used the command `ifelse(predictions > 0.5, 1, 0)`, using a threshold of 0.5. This indicates that if the probability is greater than 0.5, the predicted class is 1, otherwise, it's 0.
 
 **Accuracy**
 
-With the help of Dr. Poliak’s lectures and slides, we create a confusion matrix to compare predicted class with the actual class in test set. The confusion matrix is important as it assists in the evaluation of the performance of our model. Now comes the main part, that is calculating the accuracy. To calculate accuracy we used the command “​​accuracy \<- sum(diag(confusionMatrix)) / sum(confusionMatrix)”. In simple words, divide the sum of the diagonal elements in the Confusion Matrix by the total number of predictions. We get an accuracy of approximately 88.32%, indicating that the logistic regression model correctly predicts the outcome about 88% of the time. *(FIX THIS)*
+With the help of Dr. Poliak’s lectures and slides, we create a confusion matrix to compare predicted class with the actual class in test set. The confusion matrix is important as it assists in the evaluation of the performance of our model. Now comes the main part, that is calculating the accuracy. To calculate accuracy we used the command `accuracy <- sum(diag(confusionMatrix)) / sum(confusionMatrix)`. In simple words, divide the sum of the diagonal elements in the Confusion Matrix by the total number of predictions. We get an accuracy of approximately 88.32%, indicating that the logistic regression model correctly predicts the outcome about 88% of the time. *(FIX THIS)*
 
 **Summary**
 
