@@ -1,5 +1,5 @@
 ---
-title: "Project Draft"
+title: "Final Project"
 format: pdf
 editor: visual
 ---
@@ -48,9 +48,44 @@ $$
 f(x)=\beta_0 + \beta_1 \cdot RSC + \beta_2 \cdot SAR + \beta_3 \cdot Na + \beta_4 \cdot E.C + \beta_5 \cdot TDS + \beta_6 \cdot HCO3 + \beta_7 \cdot pH + \beta_8 \cdot Mandal + \beta_9 \cdot Village
 $$
 
+```{r}
+library(dplyr)
+library(ggplot2)
+library(caret)
+
+groundwater_data <- read.csv("C:/Users/braya/OneDrive/Desktop/4322 Project/4322_project/ground_water_quality_2022_post.csv")
+
+# Convert 'Classification.1' to binary
+groundwater_data$Classification.1 <- ifelse(groundwater_data$Classification.1 == "P.S.", 1, 0)
+
+# Select specific columns and remove missing values
+selected_data <- groundwater_data %>%
+  select(RSCmeqL, SAR, Na, E.C, TDS, HCO3, pH, mandal, village, Classification.1) %>%
+  na.omit()
+
+
+str(selected_data)  # Should show the expected structure
+colnames(selected_data)  # Confirm the selected columns
+
+# Convert categorical variables to factors
+selected_data$mandal <- as.factor(selected_data$mandal)
+selected_data$village <- as.factor(selected_data$village)
+
+# One-hot encode categorical variables except the response variable
+dummy_vars <- model.matrix(~ mandal + village, data = selected_data)
+
+numerical_vars <- selected_data[, c("RSCmeqL", "SAR", "Na", "E.C", "TDS", "HCO3", "pH")]  # Numerical predictors
+response_var <- selected_data$Classification.1  # Response variable
+final_data <- cbind(as.data.frame(dummy_vars), numerical_vars, Classification.1 = response_var)  # Combine with dummy variables
+
+
+# Check that 'final_data' is a data frame
+is.data.frame(final_data)  # Should return TRUE
+```
+
 **Partitioning the Data:**
 
-We set our seed to 123 for reproducibility. We split “final_data” into training and testing sets using `createDataPartition`. This makes our model use 80% for training and the remaining 20% for testing.  The split is stratified based on the response variable, ensuring the equal distribution of classes in both sets.
+We set our seed to 123 for reproducibility. We split “final_data” into training and testing sets using `createDataPartition`. This makes our model use 80% for training and the remaining 20% for testing with 10 different splits when placed in the for loop.  The split is stratified based on the response variable, ensuring the equal distribution of classes in both sets.
 
 **Logistic Regression:**
 
@@ -60,9 +95,59 @@ We build our Logistic Regression model using glm with a binomial family, and hav
 
 In order to make predictions on the test set, we use `predict()` command. Since Logistic Regression is popular for its usage to predict the probability of an outcome, we use the `Type = “response”` argument to indicate that predictions should be probabilities. Now we want to convert our predicted probabilities to binary class predictions, for which we used the command `ifelse(predictions > 0.5, 1, 0)`, using a threshold of 0.5. This indicates that if the probability is greater than 0.5, the predicted class is 1, otherwise, it's 0.
 
+```{r}
+# List of Confusion Matrices
+conf_mat = list()
+
+# List of Accuracies
+accuracies = list()
+
+# Partition the data into training and testing sets
+set.seed(123)
+conf_mat <- list()
+accuracies <- numeric(10)
+
+for (i in 1:10) {
+  trainIndex <- createDataPartition(final_data$Classification.1, p = 0.8, list = FALSE)
+  trainData <- final_data[trainIndex, ]
+  testData <- final_data[-trainIndex, ]
+  
+  if (i == 5){
+    train = trainData
+    test = testData
+  }
+  
+  # Build a logistic regression model with 'Classification.1' as the response variable
+  model <- glm(Classification.1 ~ ., data = trainData, family = binomial)
+  
+  # Make predictions on the test set
+  predictions <- predict(model, newdata = testData, type = "response")
+  predictedClass <- ifelse(predictions > 0.5, 1, 0)
+  
+  # Create a confusion matrix
+  conf_mat[[i]] <- confusionMatrix(factor(predictedClass), factor(testData$Classification.1))
+  
+  # Calculate accuracy
+  accuracies[i] <- conf_mat[[i]]$overall['Accuracy']
+}
+```
+
+```{r, eval=FALSE}
+best_model = glm(Classification.1 ~., data = train, family = binomial)
+
+summary(best_model)
+
+# Hard to interpret, so echo set to FALSE!!!
+```
+
 **Accuracy**
 
-With the help of Dr. Poliak’s lectures and slides, we create a confusion matrix to compare predicted class with the actual class in test set. The confusion matrix is important as it assists in the evaluation of the performance of our model. Now comes the main part, that is calculating the accuracy. To calculate accuracy we used the command `accuracy <- sum(diag(confusionMatrix)) / sum(confusionMatrix)`. In simple words, divide the sum of the diagonal elements in the Confusion Matrix by the total number of predictions. We get an accuracy of approximately 88.32%, indicating that the logistic regression model correctly predicts the outcome about 88% of the time. *(FIX THIS)*
+```{r}
+# Print accuracies
+print(accuracies)
+```
+
+With the help of Dr. Poliak’s lectures and slides, we create a confusion matrix to compare predicted class with the actual class in test set. The confusion matrix is important as it assists in the evaluation of the performance of our model. Now comes the main part, that is calculating the accuracy. To calculate accuracy we used the command `accuracy <- sum(diag(confusionMatrix)) / sum(confusionMatrix)`. In simple words, divide the sum of the diagonal elements in the Confusion Matrix by the total number of predictions. We get an accuracy ranging between 52.1% to 92.3%, indicating that the logistic regression model correctly predicts the outcome between 52.1% to 92.3% of the time.
 
 **Summary**
 
@@ -201,9 +286,9 @@ results <- list()
 
 **Robustness and Generalizability of the Model:**
 
-By performing grid search and cross-validation across multiple data splits, the optimized Random Forest model demonstrates robustness and generalizability. The model's ability to consistently perform well across diverse subsets of the data indicates its stability and reliability. This ensures that the selected hyperparameters are not overly tailored to a specific subset of the data but rather capture underlying patterns that generalize to unseen instances.
+By performing grid search and cross-validation across multiple data splits, the optimized Random Forest model demonstrates robustness and generalizability. The model's ability to consistently perform well across diverse subsets of the data indicates its stability and reliability. This ensures that the selected hyperparameters are not overly tailored to a specific subset of the data but rather capture underlying patterns that generalize to unseen instances. Due to long run time for the code below, code chunk evaluation was set to FALSE.
 
-```{r}
+```{r, eval=FALSE}
 # Perform 10 different 80/20 splits and grid search on each split
 for (split in 1:10) {
   # Set seed for reproducibility
@@ -295,8 +380,13 @@ print(best_model_params)
 
 ```
 
-**\
-**The results of the model evaluation indicate that the model labeled as "Split_1_Model_67" achieved a mean cross-validation score of approximately 0.9908 for Split 1 of the data. This score suggests that the model performed exceptionally well on the validation data for this particular split. Further analysis reveals that this model was trained with a specific combination of hyperparameters, which can be found below the Score.
+```{r}
+print(getwd())
+```
+
+![Hyperparameter Tuning Results](Tuning_Results.png)
+
+The results of the model evaluation indicate that the model labeled as "Split_1_Model_67" achieved a mean cross-validation score of approximately 0.9908 for Split 1 of the data. This score suggests that the model performed exceptionally well on the validation data for this particular split. Further analysis reveals that this model was trained with a specific combination of hyperparameters, which can be found below the Score.
 
 In conclusion, the machine learning model developed using Random Forests and optimized through cross-validation demonstrates high predictive accuracy for the task of groundwater quality prediction. The results of the evaluation process provide valuable insights into the performance of the model and offer guidance for future model development and refinement.
 
@@ -308,8 +398,20 @@ While the optimized Random Forest model shows promising results in predicting gr
 
 ## Logistic Regression:
 
+Due to the one-hot-encoding of our categorical variables, Mandal and Village, the interpretability of the summary of our best logistic regression model, which scored 92.3% accuracy, is difficult. Thus, we were not able to easily determine which features were significant and their respective coefficients. As a result, we were not able to address our objective of identifying correlations between water quality parameters using logistic regression. However, we were able to see that this model performed adequately in predicting unseen data. The model using the first training/testing split performed quite poorly with an accuracy of 52%, but in general performed well with the other splits. With this information, we can say that our logistic regression model may be used in predicting water safety, but it's not really the best if it's the only model used.
+
 ## Random Forest:
 
 In general, we observed that the random forest model, whether base or tuned, performed well on the testing data. This indicates that our models are robust and generalizable. Starting with the base model, among the 10 different splits, we observed testing errors between 0% to 2.4% and accuracies between 97.6% to 100%. This suggests that our variables positively contributed to our base model's classification of the test observations, with RSC, SAR, and HCO3 being the most important across all models. It is safe to assume that these top variables, along with the other important variables, will be present during the tuning process of the random forest model. This addresses our objective of identifying correlations between water quality parameters and their implications for soil health. By tuning the model, we were able to find the optimal hyperparameters that minimized the model's test error and maximized accuracy on unseen data. We observed that the parameters that led to the best results were 50 estimators, a max depth of 10, a minimum sample split of 5, a minimum leaf sample of 5, and a maximum number of features of $\sqrt{p}$ where $p$ is the total number of features. With these hyperparameters, and the previously identified water quality parameters, we ensure that our model would have a classification accuracy of approximately 99%.
 
 # Conclusion
+
+To recap, we were not able to determine the structure of our optimal logistic model due to its lack of interpretability. However, in general, the models tended to perform well with unseen data, with the first model being the outlier, scoring an accuracy of 52%. Conversely, we were able to identify the most important variables used in the random forest models, which showed the correlation between water quality parameters. Additionally, through hyperparameter tuning, we determined the best parameters for our random forest model, resulting in a classification accuracy of approximately 99%. Consequently, we concluded that the random forest model was the best choice for our water safety classification problem.
+
+# Bibliography
+
+*Telangana Ground Water Department - Post monsoon Water Quality Data*. Telangana Open Data Portal. (2022). https://data.telangana.gov.in/dataset/telangana-ground-water-department-post-monsoon-water-quality-data
+
+Poliak, C. (2024). *Logistic Regression* \[PowerPoint slides\]. University of Houston Department of Mathematics.
+
+Poliak, C. (2024). *Lecture 18 Tree Based Methods: Random Forest* \[PowerPoint slides\]. University of Houston Department of Mathematics.
